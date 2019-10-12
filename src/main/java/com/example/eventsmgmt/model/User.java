@@ -13,7 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import javax.persistence.CascadeType;
 
 /**
  * User
@@ -62,20 +65,12 @@ public class User {
     )
     private Set<Role> role;
 
-    // public User(int id, String username, String password, String email, String firstName, String middleName,
-    //         String lastName, String mobile, Timestamp createdAt, Timestamp lastUpdated, Set<Role> role) {
-    //     this.id = id;
-    //     this.username = username;
-    //     this.password = password;
-    //     this.email = email;
-    //     this.firstName = firstName;
-    //     this.middleName = middleName;
-    //     this.lastName = lastName;
-    //     this.mobile = mobile;
-    //     this.createdAt = createdAt;
-    //     this.lastUpdated = lastUpdated;
-    //     this.role = role;
-    // }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_event",
+        joinColumns = { @JoinColumn(name = "user_id"),},
+        inverseJoinColumns = { @JoinColumn(name = "event_id") }
+    )
+    private Event event;
 
     public User(String username, String password, String email, String firstName, String middleName,
             String lastName, String mobile) {
@@ -181,6 +176,14 @@ public class User {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
 }
