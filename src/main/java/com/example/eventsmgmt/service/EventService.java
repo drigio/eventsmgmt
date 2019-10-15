@@ -3,7 +3,6 @@ package com.example.eventsmgmt.service;
 import java.util.List;
 
 import com.example.eventsmgmt.model.Event;
-import com.example.eventsmgmt.model.User;
 import com.example.eventsmgmt.repository.EventRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

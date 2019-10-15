@@ -14,8 +14,10 @@ import com.example.eventsmgmt.model.User;
 import com.example.eventsmgmt.model.payload.ApiResponse;
 import com.example.eventsmgmt.security.UserPrincipal;
 import com.example.eventsmgmt.service.AdminService;
+import com.example.eventsmgmt.service.CoordinatorService;
 import com.example.eventsmgmt.service.EventService;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,9 @@ public class AdminController {
 
     @Autowired
     EventService eventService;
+
+    @Autowired
+    CoordinatorService coordinatorService;
 
     /*
         Admin Related API
@@ -98,7 +103,7 @@ public class AdminController {
             return new ResponseEntity<Object>(new ApiResponse(false, "Id doesn't exist"), HttpStatus.BAD_REQUEST);
         }
         adminService.updateAdminById(id, user);
-        return new ResponseEntity<Object>(new ApiResponse(true, "Admin Updated Successfully"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(new ApiResponse(true, "Admin Updated Successfully"), HttpStatus.OK);
     }
 
     /*
@@ -148,8 +153,72 @@ public class AdminController {
             return new ResponseEntity<Object>(new ApiResponse(false, "Event Id doesn't exist"), HttpStatus.BAD_REQUEST);
         }
         eventService.deleteById(id);
-        return new ResponseEntity<Object>(new ApiResponse(true, "Event Deleted Successfully"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<Object>(new ApiResponse(true, "Event Deleted Successfully"), HttpStatus.OK);
+    }
+    
+    /*
+        Coordinator Related
+    */
+
+
+    @PostMapping(value = "/coordinators/add")
+    public ResponseEntity<?> addCoordinator(@Valid @RequestBody User user) {
+
+        if (coordinatorService.existsByUsername(user.getUsername())) {
+            return new ResponseEntity<Object>(new ApiResponse(false, "Username already exists"),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        if (coordinatorService.existsByEmail(user.getEmail())) {
+            return new ResponseEntity<Object>(new ApiResponse(false, "Email already exists"), HttpStatus.BAD_REQUEST);
+        }
+
+        User addUser = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), user.getEmail(),
+                user.getFirstName(), user.getMiddleName(), user.getLastName(), user.getMobile());
+        coordinatorService.addCoordinator(addUser);
+
+        return new ResponseEntity<Object>(new ApiResponse(true, "Coordinator Added Successfully"), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/coordinators/{id}")
+    public User getCoordinatorById(@PathVariable("id") int id) {
+        return coordinatorService.getById(id) ;
+    }
+
+    @GetMapping(value = "/coordinators/username/{username}")
+    public User getCoordinatorByUsername(@PathVariable("username") String username) {
+        return coordinatorService.getByUsername(username);
+    }
+
+    @GetMapping(value = "/coordinators")
+    public List<User> getCoordinators() {
+        return coordinatorService.getAllCoordinators();
+    }
     
+    @DeleteMapping(value = "/coordinators/{id}")
+    public ResponseEntity<?> deleteCoordinator(@PathVariable("id") int id) {
+        if (!coordinatorService.existsById(id)) {
+            return new ResponseEntity<Object>(new ApiResponse(false, "Id doesn't exist"), HttpStatus.BAD_REQUEST);
+        }
+        coordinatorService.deleteById(id);
+        return new ResponseEntity<Object>(new ApiResponse(true, "Coordinator Deleted Successfully"), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/coordinators/event")
+    public ResponseEntity<?> updateEventForCoordinator(@RequestBody String body) {
+
+        JSONObject jsonObj = new JSONObject(body);
+        int coordinatorId = Integer.parseInt(jsonObj.getString("coordinatorId"));
+        int eventId = Integer.parseInt(jsonObj.getString("eventId"));
+
+        if (!coordinatorService.existsById(coordinatorId)) {
+            return new ResponseEntity<Object>(new ApiResponse(false, "Id doesn't exist"), HttpStatus.BAD_REQUEST);
+        } else if (!eventService.existsById(eventId)) {
+            return new ResponseEntity<Object>(new ApiResponse(false, "Event Id doesn't exist"), HttpStatus.BAD_REQUEST);
+        }
+
+        coordinatorService.updateEventForCoordinator(coordinatorId, eventId);
+        return new ResponseEntity<Object>(new ApiResponse(true, "Event Attached to Coordinator Successfully"), HttpStatus.OK);
+    }
+
 }

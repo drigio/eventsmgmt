@@ -31,6 +31,8 @@ public class AdminService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    //Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new RuntimeException("Role not found"));
+
     public void addAdmin(User user) {
 
         //Set admin role
@@ -54,15 +56,28 @@ public class AdminService {
 	}
 
 	public User getById(int id) {
-		return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
+        Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new RuntimeException("Role not found"));
+        if(user.getRole().contains(admin)) {
+            return user;
+        }
+        return null;
 	}
 
 	public List<User> getAllAdmins() {
-		return userRepository.findAll();
+        Set<Role> roles =  new HashSet<Role>();
+        Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new RuntimeException("Role not found"));
+        roles.add(admin);
+		return userRepository.findByRole(roles);
 	}
 
 	public User getByUsername(String username) {
-		return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found by username"));
+        User user =  userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found by username"));
+        Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new RuntimeException("Role not found"));
+        if(user.getRole().contains(admin)) {
+            return user;
+        }
+        return null;
 	}
 
 	public void deleteById(int id) {
