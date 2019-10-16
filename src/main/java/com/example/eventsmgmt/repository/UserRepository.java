@@ -1,7 +1,10 @@
 package com.example.eventsmgmt.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import com.example.eventsmgmt.model.Role;
 import com.example.eventsmgmt.model.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +19,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByUsername(String username);
 
-	boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
+    
+    List<User> findByRole(Set<Role> role);
     
 }

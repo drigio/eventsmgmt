@@ -78,7 +78,7 @@ Use [Postman](https://www.getpostman.com
     }
     ```
 #### Get Admin By Username
-- Request URL :- http://localhost:8080/api/admin/admins/{username}
+- Request URL :- http://localhost:8080/api/admin/admins/username/{username}
 - Request Method :- GET
 
 #### Get All Admins

@@ -1,7 +1,6 @@
 package com.example.eventsmgmt.model;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -16,28 +15,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import javax.persistence.CascadeType;
-
 /**
- * User
+ * Participant
  */
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "participant")
+public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
+    @Column(name = "participant_id")
     private int id;
-
-    @Column(name = "username", unique = true)
-    private String username;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "first_name")
     private String firstName;
@@ -48,6 +36,9 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "mobile")
     private String mobile;
 
@@ -57,77 +48,43 @@ public class User {
     @Column(name = "last_updated")
     private Timestamp lastUpdated;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="updated_by")
+    private User updatedBy;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "user_role",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
+        name = "participant_event",
+        joinColumns = @JoinColumn(name = "participant_id"),
+        inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    private Set<Role> role;
+    private Set<Event> events;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinTable(name = "user_event",
-        joinColumns = { @JoinColumn(name = "user_id"),},
-        inverseJoinColumns = { @JoinColumn(name = "event_id") }
-    )
-    private Event event;
-
-    public User(String username, String password, String email, String firstName, String middleName,
-            String lastName, String mobile) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    
+    public Participant(String firstName, String middleName, String lastName, String email, String mobile,
+            Timestamp createdAt, Timestamp lastUpdated, User createdBy, User updatedBy) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
+        this.email = email;
         this.mobile = mobile;
-        Date date =  new Date();
-        this.createdAt = new Timestamp(date.getTime());
-        this.lastUpdated = this.createdAt;
-    }
-
-    public User() {
-        
+        this.createdAt = createdAt;
+        this.lastUpdated = lastUpdated;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
     }
     
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setRole(Set<Role> role) {
-        this.role = role;
-    }
-
-    public Set<Role> getRole() {
-        return role;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getFirstName() {
@@ -154,6 +111,14 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getMobile() {
         return mobile;
     }
@@ -166,6 +131,10 @@ public class User {
         return createdAt;
     }
 
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Timestamp getLastUpdated() {
         return lastUpdated;
     }
@@ -174,16 +143,33 @@ public class User {
         this.lastUpdated = lastUpdated;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
+    public Set<Event> getEvents() {
+        return events;
     }
 
-    public Event getEvent() {
-        return event;
+    public void setEvents(Set<Event> events) {
+        this.events = events;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public User getCreatedBy() {
+        return createdBy;
     }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public User getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(User updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Participant() {
+    }
+
+    
 
 }
