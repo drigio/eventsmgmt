@@ -81,7 +81,11 @@ public class AdminService {
 	}
 
 	public void deleteById(int id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
+        Role admin = roleRepository.findByName("ADMIN").orElseThrow(() -> new RuntimeException("Role not found"));
+        if(user.getRole().contains(admin)) {
+            userRepository.deleteById(id);
+        }
 	}
 
 	public void updateAdminById(int id, User user) {

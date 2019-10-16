@@ -80,7 +80,12 @@ public class CoordinatorService {
 	}
 
 	public void deleteById(int id) {
-        userRepository.deleteById(id);
+        Role coordinator = roleRepository.findByName("COORDINATOR").orElseThrow(() -> new RuntimeException("Role not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Coordinator Not Found By Id"));
+        if(user.getRole().contains(coordinator)) {
+            userRepository.deleteById(id);
+        }
+        throw new RuntimeException("Coordinator Not Found!");
 	}
 
 	public void updateEventForCoordinator(int coordinatorId, int eventId) {
