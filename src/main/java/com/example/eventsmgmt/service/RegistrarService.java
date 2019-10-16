@@ -85,8 +85,7 @@ public class RegistrarService {
             userRepository.deleteById(id);
         }
         throw new RuntimeException("Registrar Not Found!");
-    }
-    
+    } 
 
     
 }

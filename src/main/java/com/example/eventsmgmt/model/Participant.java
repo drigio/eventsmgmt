@@ -66,7 +66,7 @@ public class Participant {
 
     
     public Participant(String firstName, String middleName, String lastName, String email, String mobile,
-            Timestamp createdAt, Timestamp lastUpdated, User createdBy, User updatedBy, Set<Event> events) {
+            Timestamp createdAt, Timestamp lastUpdated, User createdBy, User updatedBy) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -76,7 +76,6 @@ public class Participant {
         this.lastUpdated = lastUpdated;
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
-        this.events = events;
     }
     
 
