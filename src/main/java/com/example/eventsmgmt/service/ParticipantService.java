@@ -9,7 +9,10 @@ import com.example.eventsmgmt.model.Participant;
 import com.example.eventsmgmt.repository.ParticipantRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.SimpleMailMessage;
+
 
 /**
  * ParticipantService
@@ -22,6 +25,9 @@ public class ParticipantService {
 
     @Autowired
     EventService eventService;
+    
+    @Autowired
+    JavaMailSender javaMailSender;
 
     public boolean existsByEmail(String email) {
 		return participantRepository.existsByEmail(email);
@@ -46,6 +52,7 @@ public class ParticipantService {
             events.add(event);
             participant.setEvents(events);
             participantRepository.save(participant);
+            sendMail(participant.getEmail(), participant.getFirstName(), participant.getLastName(), event.getName());     
         }
 	}
 
@@ -67,4 +74,24 @@ public class ParticipantService {
         return participantRepository.findAll();
     }
 
+    public void sendMail(String email, String firstName, String lastName, String eventName) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(email);
+        msg.setFrom(eventName + " Team <comeit_technofest18@gppune.ac.in>");
+        msg.setSubject("Successfully Registered");
+        msg.setText(
+            "Dear " + firstName + " " + lastName + ", \n" +
+            "You have been successfully registered for " + eventName + ". \n" +
+            "TechFest 2K19 is held on held on 19th and 20th January 2019.\n" +
+            "Further details will be mailed to you shortly.\n" +
+            "Kindly show this email at the venue for the entry.\n\n" +
+            "Regards,\n" + 
+            "TechFest Team"
+        );
+        try{
+            javaMailSender.send(msg);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -13,6 +13,7 @@ import com.example.eventsmgmt.security.UserPrincipal;
 import com.example.eventsmgmt.service.AdminService;
 import com.example.eventsmgmt.service.EventService;
 import com.example.eventsmgmt.service.ParticipantService;
+import com.example.eventsmgmt.service.RegistrarService;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +40,14 @@ public class RegistrarController {
     ParticipantService participantService;
 
     @Autowired
-    AdminService adminService;
+    RegistrarService registrarService;
 
     @Autowired
     EventService eventService;
 
     @PreAuthorize("hasAuthority('REGISTRAR')")
     @PostMapping(value = "/participants/add")
-    public ResponseEntity<?> addAdmin(@Valid @RequestBody Participant participant) {
+    public ResponseEntity<?> addParticipant(@Valid @RequestBody Participant participant) {
 
         if (participantService.existsByEmail(participant.getEmail())) {
             return new ResponseEntity<Object>(new ApiResponse(false, "Email already exists"), HttpStatus.BAD_REQUEST);
@@ -54,7 +55,7 @@ public class RegistrarController {
 
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User currentUser = adminService.getByUsername(userPrincipal.getUsername());
+        User currentUser = registrarService.getByUsername(userPrincipal.getUsername());
 
         Date date = new Date();
         Timestamp currTimestamp = new Timestamp(date.getTime());
@@ -90,8 +91,6 @@ public class RegistrarController {
 
         participantService.attachEventForParticipant(participantId, eventId);
 
-        //Send Mail
-
         return new ResponseEntity<Object>(new ApiResponse(true, "Event Attached to Participant Successfully"), HttpStatus.OK);
     }
 
@@ -107,6 +106,11 @@ public class RegistrarController {
     @GetMapping("/participants/all")
     public List<Participant> getAllParticipants() {
         return participantService.getAllParticipants();
+    }
+
+    @GetMapping("/participants/sendmail")
+    public void sendMail() {
+        participantService.sendMail("drigiobalboa@gmail.com", "Drigio", "Balboa", "Webber");
     }
 
 }
